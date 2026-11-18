@@ -1,0 +1,26 @@
+name: Heresy Check
+
+# The CI Inquisitor: rejects any attempt to reach Ver. 1.0.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  inquisition:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Examine the VERSION for heresy
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          echo "Declared version: ${version}"
+          if ! echo "${version}" | grep -Eq '^0\.9\.[0-9]+([-.+][0-9A-Za-z.-]+)?$'; then
+            echo "::error file=VERSION::HERESY DETECTED. '${version}' strays from the path of 0.9.x. Thou Shalt Never Be 1.0."
+            exit 1
+          fi
+          echo "The faith remains unfinished. Peace be upon this build."
